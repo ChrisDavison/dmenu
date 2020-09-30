@@ -1,17 +1,8 @@
-From 61abc60dbfaa8ec63fcd176307308aee88a19e32 Mon Sep 17 00:00:00 2001
-From: Miles Alan <m@milesalan.com>
-Date: Sat, 10 Aug 2019 17:20:08 -0500
-Subject: [PATCH] Display number of matched and total items in top right corner
-
----
- dmenu.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
-
 diff --git a/dmenu.c b/dmenu.c
-index 6b8f51b..98c5810 100644
+index 223010a..dcff5cf 100644
 --- a/dmenu.c
 +++ b/dmenu.c
-@@ -24,6 +24,8 @@
+@@ -25,6 +25,8 @@
                               * MAX(0, MIN((y)+(h),(r).y_org+(r).height) - MAX((y),(r).y_org)))
  #define LENGTH(X)             (sizeof X / sizeof X[0])
  #define TEXTW(X)              (drw_fontset_getwidth(drw, (X)) + lrpad)
@@ -19,17 +10,17 @@ index 6b8f51b..98c5810 100644
 +#define NUMBERSBUFSIZE        (NUMBERSMAXDIGITS * 2) + 1
  
  /* enums */
- enum { SchemeNorm, SchemeSel, SchemeOut, SchemeLast }; /* color schemes */
-@@ -34,6 +36,7 @@ struct item {
- 	int out;
+ enum { SchemeNorm, SchemeSel, SchemeNormHighlight, SchemeSelHighlight,
+@@ -38,6 +40,7 @@ struct item {
+ 	double distance;
  };
  
 +static char numbers[NUMBERSBUFSIZE] = "";
  static char text[BUFSIZ] = "";
  static char *embed;
  static int bh, mw, mh;
-@@ -126,6 +129,21 @@ drawitem(struct item *item, int x, int y, int w)
- 	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
+@@ -75,6 +78,22 @@ appenditem(struct item *item, struct item **list, struct item **last)
+ 	*last = item;
  }
  
 +static void
@@ -47,10 +38,11 @@ index 6b8f51b..98c5810 100644
 +	snprintf(numbers, NUMBERSBUFSIZE, "%d/%d", numer, denom);
 +}
 +
++
  static void
- drawmenu(void)
+ calcoffsets(void)
  {
-@@ -151,6 +169,7 @@ drawmenu(void)
+@@ -197,6 +216,7 @@ drawmenu(void)
  		drw_rect(drw, x + curpos, 2, 2, bh - 4, 1, 0);
  	}
  
@@ -58,7 +50,7 @@ index 6b8f51b..98c5810 100644
  	if (lines > 0) {
  		/* draw vertical list */
  		for (item = curr; item != next; item = item->right)
-@@ -165,13 +184,15 @@ drawmenu(void)
+@@ -211,13 +231,15 @@ drawmenu(void)
  		}
  		x += w;
  		for (item = curr; item != next; item = item->right)
@@ -76,6 +68,3 @@ index 6b8f51b..98c5810 100644
  	drw_map(drw, win, 0, 0, mw, mh);
  }
  
--- 
-2.19.2
-
